@@ -10,16 +10,56 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+    @IBOutlet private weak var display: UILabel!
+    
+    private var displayValue: Double {
+        get {
+            return Double(display.text!)!
+        }
+        set {
+            display.text = String(newValue)
+        }
     }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    
+    private var userIsInTheMiddleOfTyping = false
+    
+    @IBAction private func pressDigit(sender: UIButton) {
+        let digit = sender.currentTitle!
+        
+        if userIsInTheMiddleOfTyping {
+            let currentValueOnDisplay = display.text!
+            display.text = currentValueOnDisplay + digit
+        } else {
+            display.text = digit
+        }
+        userIsInTheMiddleOfTyping = true
     }
-
-
+    
+    private var brain = CalculatorBrain()
+    
+    @IBAction private func pressOperator(sender: UIButton) {
+        if userIsInTheMiddleOfTyping {
+            brain.setOperand(displayValue)
+            userIsInTheMiddleOfTyping = false
+        }
+        
+        if let mathematicalSymbol = sender.currentTitle {
+            brain.performOperation(mathematicalSymbol)
+        }
+        displayValue = brain.result
+    }
+    
+    @IBAction func touchPoint(sender: UIButton) {
+        if( display.text?.rangeOfString(".") == nil ){
+            display.text! += "."
+            userIsInTheMiddleOfTyping = true
+        }
+    }
+    
+    @IBAction func clearDisplay(sender: UIButton) {
+        display.text = "0"
+        userIsInTheMiddleOfTyping = false
+        brain.flushPendingOperations()
+    }
 }
 
