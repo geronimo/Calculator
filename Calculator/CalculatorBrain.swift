@@ -12,6 +12,15 @@ class CalculatorBrain {
     
     private var accumulator = 0.0
     
+    private var description = ""
+    private var descriptionEnding = "..."
+    
+    var isPartialResult: Bool {
+        get {
+            return pending != nil
+        }
+    }
+    
     private var operations: Dictionary<String, Operation> = [
         "π": Operation.Constant(M_PI),
         "e": Operation.Constant(M_E),
@@ -42,11 +51,17 @@ class CalculatorBrain {
     
     func setOperand(operand: Double) {
         accumulator = operand
+        if description == "" {
+            description += "\(String(operand))"
+        } else {
+            description += " \(String(operand))"
+        }
     }
     
     func flushPendingOperations() {
         self.pending = nil
         self.accumulator = 0.0
+        self.description = ""
     }
     
     private var pending: PendingBinaryOperationInfo?
@@ -56,13 +71,23 @@ class CalculatorBrain {
             switch operation {
             case .Constant(let associatedValue):
                 accumulator = associatedValue
+                
+                description = "\(description) \(mathematicalSymbol)"
+                descriptionEnding = " ..."
             case .Unary(let function):
                 accumulator = function(accumulator)
+                
+                description = "\(mathematicalSymbol)(\(description))"
             case .Binary(let function):
                 executePendingBinaryOperation()
                 pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand: accumulator)
+                
+                description = "\(description) \(mathematicalSymbol)"
+                descriptionEnding = "..."
             case .Equal:
                 executePendingBinaryOperation()
+                
+                descriptionEnding = "="
             }
         }
     }
@@ -82,6 +107,12 @@ class CalculatorBrain {
     var result: Double {
         get {
             return accumulator
+        }
+    }
+    
+    var publicDescription: String {
+        get {
+            return description + descriptionEnding
         }
     }
     

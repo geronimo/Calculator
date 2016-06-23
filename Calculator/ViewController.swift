@@ -12,6 +12,8 @@ class ViewController: UIViewController {
 
     @IBOutlet private weak var display: UILabel!
     
+    @IBOutlet weak var descriptionDisplay: UILabel!
+    
     private var displayValue: Double {
         get {
             return Double(display.text!)!
@@ -46,6 +48,8 @@ class ViewController: UIViewController {
         if let mathematicalSymbol = sender.currentTitle {
             brain.performOperation(mathematicalSymbol)
         }
+        
+        descriptionDisplay.text = brain.publicDescription
         displayValue = brain.result
     }
     
@@ -58,6 +62,7 @@ class ViewController: UIViewController {
     
     @IBAction func clearDisplay(sender: UIButton) {
         display.text = "0"
+        descriptionDisplay.text = ""
         userIsInTheMiddleOfTyping = false
         brain.flushPendingOperations()
     }
