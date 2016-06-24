@@ -25,6 +25,8 @@ class ViewController: UIViewController {
     
     private var userIsInTheMiddleOfTyping = false
     
+    private var program: AnyObject?
+    
     @IBAction private func pressDigit(sender: UIButton) {
         let digit = sender.currentTitle!
         
@@ -79,10 +81,14 @@ class ViewController: UIViewController {
     }
     
     @IBAction func saveProgram(sender: UIButton) {
+        program = brain.program
     }
     
     
     @IBAction func restoreProgram() {
+        brain.program = program!
+        display.text = brain.result
+        descriptionDisplay.text = brain.description
     }
 }
 
