@@ -49,8 +49,8 @@ class ViewController: UIViewController {
             brain.performOperation(mathematicalSymbol)
         }
         
-        descriptionDisplay.text = brain.publicDescription
-        displayValue = brain.result
+        descriptionDisplay.text = brain.description
+        display.text = brain.result
     }
     
     @IBAction func touchPoint(sender: UIButton) {
@@ -62,9 +62,20 @@ class ViewController: UIViewController {
     
     @IBAction func clearDisplay(sender: UIButton) {
         display.text = "0"
-        descriptionDisplay.text = ""
+        descriptionDisplay.text = " "
         userIsInTheMiddleOfTyping = false
         brain.flushPendingOperations()
+    }
+    
+    @IBAction func touchDelete(sender: AnyObject) {
+        if let newText = display.text?.characters.dropLast() {
+            if newText.count > 0 {
+                display.text = String(newText)
+            } else {
+                userIsInTheMiddleOfTyping = false
+                display.text = "0"
+            }
+        }
     }
 }
 

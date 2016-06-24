@@ -9,16 +9,90 @@
 import Foundation
 
 class CalculatorBrain {
-    
-    private var accumulator = 0.0
-    
-    private var description = ""
-    private var descriptionEnding = "..."
-    
+
     var isPartialResult: Bool {
         get {
             return pending != nil
         }
+    }
+    
+    var result: String {
+        get {
+            return formatDouble(accumulator)
+        }
+    }
+    
+    func setOperand(operand: Double) {
+        accumulator = operand
+        
+        if isPartialResult {
+            descriptionArray.append(formatDouble(accumulator))
+        } else {
+            descriptionArray = [formatDouble(accumulator)]
+        }
+    }
+    
+    func flushPendingOperations() {
+        self.pending = nil
+        self.accumulator = 0.0
+        self.descriptionArray = []
+    }
+
+    var description: String {
+        get {
+            var descriptionEnding = "..."
+            if !isPartialResult {
+                descriptionEnding = "="
+            }
+            return descriptionArray.joinWithSeparator(" ") + " " + descriptionEnding
+        }
+    }
+    
+    func performOperation(mathematicalSymbol: String) {
+        if let operation = operations[mathematicalSymbol] {
+            switch operation {
+                
+            case .Constant(let associatedValue):
+                accumulator = associatedValue
+                if isPartialResult {
+                    descriptionArray.append(mathematicalSymbol)
+                } else {
+                    descriptionArray = [mathematicalSymbol]
+                }
+                
+            case .Unary(let function):
+                if isPartialResult {
+                    let lastElement = descriptionArray.popLast()!
+                    descriptionArray.append("\(mathematicalSymbol)(\(lastElement))")
+                } else {
+                    descriptionArray[0] = "\(mathematicalSymbol)(\(descriptionArray.first!)"
+                    descriptionArray[descriptionArray.count-1] = "\(descriptionArray.last!))"
+                }
+                accumulator = function(accumulator)
+                
+            case .Binary(let function):
+                descriptionArray.append(mathematicalSymbol)
+                executePendingBinaryOperation()
+                pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand: accumulator)
+            case .Equal:
+                executePendingBinaryOperation()
+            }
+        }
+    }
+    
+    // Private methods and variables
+    
+    private var accumulator = 0.0
+    
+    private var pending: PendingBinaryOperationInfo?
+    
+    private var descriptionArray: [String] = []
+    
+    private enum Operation {
+        case Constant( Double )
+        case Unary( (Double) -> Double )
+        case Binary( (Double, Double) -> Double )
+        case Equal
     }
     
     private var operations: Dictionary<String, Operation> = [
@@ -43,55 +117,12 @@ class CalculatorBrain {
         
         "✕": Operation.Binary({ $0 * $1 }),
         "+": Operation.Binary({ $0 + $1 }),
-        "-": Operation.Binary({ $0 + $1 }),
+        "-": Operation.Binary({ $0 - $1 }),
         "÷": Operation.Binary({ $0 / $1 }),
         
         "=": Operation.Equal,
     ]
-    
-    func setOperand(operand: Double) {
-        accumulator = operand
-        if description == "" {
-            description += "\(String(operand))"
-        } else {
-            description += " \(String(operand))"
-        }
-    }
-    
-    func flushPendingOperations() {
-        self.pending = nil
-        self.accumulator = 0.0
-        self.description = ""
-    }
-    
-    private var pending: PendingBinaryOperationInfo?
-    
-    func performOperation(mathematicalSymbol: String) {
-        if let operation = operations[mathematicalSymbol] {
-            switch operation {
-            case .Constant(let associatedValue):
-                accumulator = associatedValue
-                
-                description = "\(description) \(mathematicalSymbol)"
-                descriptionEnding = " ..."
-            case .Unary(let function):
-                accumulator = function(accumulator)
-                
-                description = "\(mathematicalSymbol)(\(description))"
-            case .Binary(let function):
-                executePendingBinaryOperation()
-                pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand: accumulator)
-                
-                description = "\(description) \(mathematicalSymbol)"
-                descriptionEnding = "..."
-            case .Equal:
-                executePendingBinaryOperation()
-                
-                descriptionEnding = "="
-            }
-        }
-    }
-    
+
     private func executePendingBinaryOperation() {
         if pending != nil {
             accumulator = pending!.binaryFunction(pending!.firstOperand, accumulator)
@@ -104,22 +135,29 @@ class CalculatorBrain {
         var firstOperand: Double
     }
     
-    var result: Double {
-        get {
-            return accumulator
-        }
-    }
-    
-    var publicDescription: String {
-        get {
-            return description + descriptionEnding
-        }
-    }
-    
-    private enum Operation {
-        case Constant( Double )
-        case Unary( (Double) -> Double )
-        case Binary( (Double, Double) -> Double )
-        case Equal
+    private func formatDouble(number: Double) -> String {
+        let formater = NSNumberFormatter()
+        formater.minimumFractionDigits = 0
+        formater.maximumFractionDigits = 6
+        formater.numberStyle = .DecimalStyle
+        return formater.stringFromNumber(number)!
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
