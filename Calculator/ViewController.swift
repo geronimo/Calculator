@@ -51,6 +51,7 @@ class ViewController: UIViewController {
             brain.performOperation(mathematicalSymbol)
         }
         
+        saveProgram()
         descriptionDisplay.text = brain.description
         display.text = brain.result
     }
@@ -66,6 +67,7 @@ class ViewController: UIViewController {
         display.text = "0"
         descriptionDisplay.text = " "
         userIsInTheMiddleOfTyping = false
+        program = []
         brain.clear()
     }
     
@@ -80,7 +82,7 @@ class ViewController: UIViewController {
         }
     }
     
-    @IBAction func saveProgram(sender: UIButton) {
+    @IBAction func saveProgram() {
         program = brain.program
     }
     
@@ -90,13 +92,18 @@ class ViewController: UIViewController {
         descriptionDisplay.text = brain.description
     }
     
+    // ->M button
     @IBAction func setVariableValue() {
         brain.variableValues["M"] = displayValue
+        restoreProgram()
+        userIsInTheMiddleOfTyping = false
     }
     
+    // M button
     @IBAction func insertVariable() {
         brain.setOperand("M")
-        brain.performOperation("=")
+        userIsInTheMiddleOfTyping = false
+        saveProgram()
         descriptionDisplay.text = brain.description
         display.text = brain.result
     }

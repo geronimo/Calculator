@@ -56,6 +56,7 @@ class CalculatorBrain {
         self.accumulator = 0
         self.descriptionArray = []
         self.internalProgram = []
+        self.variableValues = [String: Double]()
     }
     
     func flushPendingOperations() {
