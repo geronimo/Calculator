@@ -11,15 +11,11 @@ import Foundation
 class CalculatorBrain {
 
     var isPartialResult: Bool {
-        get {
-            return pending != nil
-        }
+        return pending != nil
     }
     
     var result: String {
-        get {
-            return formatDouble(accumulator)
-        }
+        return formatDouble(accumulator)
     }
     
     var program: PropertyList {
@@ -65,14 +61,12 @@ class CalculatorBrain {
     }
 
     var description: String {
-        get {
-            calculateDescription()
-            var descriptionEnding = "..."
-            if !isPartialResult {
-                descriptionEnding = "="
-            }
-            return descriptionArray.joinWithSeparator(" ") + " " + descriptionEnding
+        calculateDescription()
+        var descriptionEnding = "..."
+        if !isPartialResult {
+            descriptionEnding = "="
         }
+        return descriptionArray.joinWithSeparator(" ") + " " + descriptionEnding
     }
     
     private func calculateDescription(){
