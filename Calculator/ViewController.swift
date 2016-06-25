@@ -66,7 +66,7 @@ class ViewController: UIViewController {
         display.text = "0"
         descriptionDisplay.text = " "
         userIsInTheMiddleOfTyping = false
-        brain.flushPendingOperations()
+        brain.clear()
     }
     
     @IBAction func touchDelete(sender: AnyObject) {
@@ -84,11 +84,21 @@ class ViewController: UIViewController {
         program = brain.program
     }
     
-    
     @IBAction func restoreProgram() {
         brain.program = program!
         display.text = brain.result
         descriptionDisplay.text = brain.description
+    }
+    
+    @IBAction func setVariableValue() {
+        brain.variableValues["M"] = displayValue
+    }
+    
+    @IBAction func insertVariable() {
+        brain.setOperand("M")
+        brain.performOperation("=")
+        descriptionDisplay.text = brain.description
+        display.text = brain.result
     }
 }
 

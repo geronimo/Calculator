@@ -43,22 +43,29 @@ class CalculatorBrain {
     func setOperand(operand: Double) {
         accumulator = operand
         internalProgram.append(operand)
-        
-        if isPartialResult {
-            descriptionArray.append(formatDouble(accumulator))
-        } else {
-            descriptionArray = [formatDouble(accumulator)]
-        }
+    }
+    
+    var variableValues: Dictionary<String, Double> = [String: Double]()
+    
+    func setOperand(variableName: String) {
+        performOperation("M")
+    }
+    
+    func clear() {
+        self.pending = nil
+        self.accumulator = 0
+        self.descriptionArray = []
+        self.internalProgram = []
     }
     
     func flushPendingOperations() {
         self.pending = nil
         self.accumulator = 0.0
-        self.descriptionArray = []
     }
 
     var description: String {
         get {
+            calculateDescription()
             var descriptionEnding = "..."
             if !isPartialResult {
                 descriptionEnding = "="
@@ -67,34 +74,59 @@ class CalculatorBrain {
         }
     }
     
+    private func calculateDescription(){
+        descriptionArray = []
+        var isFinal = false
+        
+        for op in internalProgram {
+            if let number = op as? Double {
+                if isFinal { descriptionArray = [] }
+                descriptionArray.append(formatDouble(number))
+                isFinal = false
+            } else if let symbol = op as? String {
+                
+                if let operation = operations[symbol] {
+                    switch operation {
+                    case .Constant:
+                        descriptionArray.append(symbol)
+                        isFinal = false
+                    case .Variable:
+                        if isFinal { descriptionArray = [] }
+                        descriptionArray.append(symbol)
+                        isFinal = false
+                    case .Unary:
+                        if !isFinal {
+                            let lastElement = descriptionArray.popLast()!
+                            descriptionArray.append("\(symbol)(\(lastElement))")
+                        } else {
+                            descriptionArray[0] = "\(symbol)(\(descriptionArray.first!)"
+                            descriptionArray[descriptionArray.count-1] = "\(descriptionArray.last!))"
+                        }
+                    case .Binary:
+                        descriptionArray.append(symbol)
+                        isFinal = false
+                    case .Equal:
+                        isFinal = true
+                    }
+                }
+            }
+        }
+    }
+    
     func performOperation(mathematicalSymbol: String) {
         internalProgram.append(mathematicalSymbol)
         
         if let operation = operations[mathematicalSymbol] {
             switch operation {
-                
             case .Constant(let associatedValue):
                 accumulator = associatedValue
-                if isPartialResult {
-                    descriptionArray.append(mathematicalSymbol)
-                } else {
-                    descriptionArray = [mathematicalSymbol]
-                }
-                
             case .Unary(let function):
-                if isPartialResult {
-                    let lastElement = descriptionArray.popLast()!
-                    descriptionArray.append("\(mathematicalSymbol)(\(lastElement))")
-                } else {
-                    descriptionArray[0] = "\(mathematicalSymbol)(\(descriptionArray.first!)"
-                    descriptionArray[descriptionArray.count-1] = "\(descriptionArray.last!))"
-                }
                 accumulator = function(accumulator)
-                
             case .Binary(let function):
-                descriptionArray.append(mathematicalSymbol)
                 executePendingBinaryOperation()
                 pending = PendingBinaryOperationInfo(binaryFunction: function, firstOperand: accumulator)
+            case .Variable(let variableName):
+                accumulator = variableValues[variableName] ?? 0
             case .Equal:
                 executePendingBinaryOperation()
             }
@@ -113,10 +145,11 @@ class CalculatorBrain {
     private var internalProgram = [PropertyList]()
     
     private enum Operation {
-        case Constant( Double )
-        case Unary( (Double) -> Double )
-        case Binary( (Double, Double) -> Double )
+        case Constant(Double)
+        case Unary((Double) -> Double)
+        case Binary((Double, Double) -> Double)
         case Equal
+        case Variable(String)
     }
     
     private var operations: Dictionary<String, Operation> = [
@@ -145,6 +178,8 @@ class CalculatorBrain {
         "÷": Operation.Binary({ $0 / $1 }),
         
         "=": Operation.Equal,
+        
+        "M": Operation.Variable("M")
     ]
 
     private func executePendingBinaryOperation() {
