@@ -50,7 +50,6 @@ class CalculatorBrain {
     func clear() {
         self.pending = nil
         self.accumulator = 0
-        self.descriptionArray = []
         self.internalProgram = []
         self.variableValues = [String: Double]()
     }
@@ -61,44 +60,42 @@ class CalculatorBrain {
     }
 
     var description: String {
-        calculateDescription()
         var descriptionEnding = "..."
         if !isPartialResult {
             descriptionEnding = "="
         }
-        return descriptionArray.joinWithSeparator(" ") + " " + descriptionEnding
+        return calculateDescription() + " " + descriptionEnding
     }
     
-    private func calculateDescription(){
-        descriptionArray = []
+    private func calculateDescription() -> String {
         var isFinal = false
+        var description = ""
         
         for op in internalProgram {
             if let number = op as? Double {
-                if isFinal { descriptionArray = [] }
-                descriptionArray.append(formatDouble(number))
+                if isFinal { description = "" }
+                description += " " + formatDouble(number)
                 isFinal = false
             } else if let symbol = op as? String {
-                
                 if let operation = operations[symbol] {
                     switch operation {
                     case .Constant:
-                        descriptionArray.append(symbol)
+                        description += " " + symbol
                         isFinal = false
                     case .Variable:
-                        if isFinal { descriptionArray = [] }
-                        descriptionArray.append(symbol)
+                        if isFinal { description = "" }
+                        description += " " + symbol
                         isFinal = false
-                    case .Unary:
+                    case .Unary(_, let format):
                         if !isFinal {
-                            let lastElement = descriptionArray.popLast()!
-                            descriptionArray.append("\(symbol)(\(lastElement))")
+                            var tmpArray = description.componentsSeparatedByString(" ")
+                            tmpArray[tmpArray.count - 1] = format(tmpArray[tmpArray.count - 1])
+                            description = tmpArray.joinWithSeparator(" ")
                         } else {
-                            descriptionArray[0] = "\(symbol)(\(descriptionArray.first!)"
-                            descriptionArray[descriptionArray.count-1] = "\(descriptionArray.last!))"
+                            description = format(description)
                         }
                     case .Binary:
-                        descriptionArray.append(symbol)
+                        description += " " + symbol
                         isFinal = false
                     case .Equal:
                         isFinal = true
@@ -106,6 +103,7 @@ class CalculatorBrain {
                 }
             }
         }
+        return description
     }
     
     func performOperation(mathematicalSymbol: String) {
@@ -115,7 +113,7 @@ class CalculatorBrain {
             switch operation {
             case .Constant(let associatedValue):
                 accumulator = associatedValue
-            case .Unary(let function):
+            case .Unary(let function, _):
                 accumulator = function(accumulator)
             case .Binary(let function):
                 executePendingBinaryOperation()
@@ -134,14 +132,12 @@ class CalculatorBrain {
     
     private var pending: PendingBinaryOperationInfo?
     
-    private var descriptionArray: [String] = []
-    
     typealias PropertyList = AnyObject
     private var internalProgram = [PropertyList]()
     
     private enum Operation {
         case Constant(Double)
-        case Unary((Double) -> Double)
+        case Unary((Double) -> Double, (String) -> String)
         case Binary((Double, Double) -> Double)
         case Equal
         case Variable(String)
@@ -151,21 +147,21 @@ class CalculatorBrain {
         "π": Operation.Constant(M_PI),
         "e": Operation.Constant(M_E),
 
-        "cos": Operation.Unary(cos),
-        "sin": Operation.Unary(sin),
-        "tan": Operation.Unary(tan),
-        "sinh": Operation.Unary(sinh),
-        "cosh": Operation.Unary(cosh),
-        "tanh": Operation.Unary(tanh),
+        "cos": Operation.Unary(cos, { "cos(\($0))" }),
+        "sin": Operation.Unary(sin, { "sin(\($0))" }),
+        "tan": Operation.Unary(tan, { "tan(\($0))" }),
+        "sinh": Operation.Unary(sinh, { "sinh(\($0))" }),
+        "cosh": Operation.Unary(cosh, { "cosh(\($0))" }),
+        "tanh": Operation.Unary(tanh, { "tanh(\($0))" }),
         
-        "ln": Operation.Unary(log),
-        "log₁₀": Operation.Unary(log10),
-        "1/⒳": Operation.Unary({ 1/$0 }),
-        "⒳²": Operation.Unary({ pow($0, 2) }),
-        "⒳³": Operation.Unary({ pow($0, 3) }),
-        "√": Operation.Unary(sqrt),
-        "∛": Operation.Unary(cbrt),
-        "±": Operation.Unary({ -$0 }),
+        "ln": Operation.Unary(log, { "log(\($0))" }),
+        "log₁₀": Operation.Unary(log10, { "log₁₀(\($0))" }),
+        "1/⒳": Operation.Unary({ 1/$0 }, { "1/(\($0))" }),
+        "⒳²": Operation.Unary({ pow($0, 2) }, { "(\($0))^2" }),
+        "⒳³": Operation.Unary({ pow($0, 3) }, { "(\($0))^3" }),
+        "√": Operation.Unary(sqrt, { "√(\($0))" }),
+        "∛": Operation.Unary(cbrt, { "∛(\($0))" }),
+        "±": Operation.Unary({ -$0 }, { "-(\($0))" }),
         
         "✕": Operation.Binary({ $0 * $1 }),
         "+": Operation.Binary({ $0 + $1 }),
