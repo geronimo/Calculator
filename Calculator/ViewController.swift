@@ -82,11 +82,11 @@ class ViewController: UIViewController {
         }
     }
     
-    @IBAction func saveProgram() {
+    func saveProgram() {
         program = brain.program
     }
     
-    @IBAction func restoreProgram() {
+    func restoreProgram() {
         brain.program = program!
         display.text = brain.result
         descriptionDisplay.text = brain.description

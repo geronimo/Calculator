@@ -67,14 +67,25 @@ class CalculatorBrain {
         return calculateDescription() + " " + descriptionEnding
     }
     
+    private func changeInOperatorsPrecedence(lastOperator: String?, newOperator: String) -> Bool {
+        if (lastOperator == "+" && newOperator == "-") || (lastOperator == "-" && newOperator == "+"){
+            return false
+        } else if (lastOperator == "✕" && newOperator == "÷") || (lastOperator == "÷" && newOperator == "✕") {
+            return false
+        }
+        return (lastOperator ?? newOperator) != newOperator
+    }
+    
     private func calculateDescription() -> String {
         var isFinal = false
         var description = ""
+        var lastOperator: String?
         
         for op in internalProgram {
             if let number = op as? Double {
                 if isFinal { description = "" }
-                description += " " + formatDouble(number)
+                if !description.isEmpty { description += " " }
+                description += formatDouble(number)
                 isFinal = false
             } else if let symbol = op as? String {
                 if let operation = operations[symbol] {
@@ -95,8 +106,13 @@ class CalculatorBrain {
                             description = format(description)
                         }
                     case .Binary:
-                        description += " " + symbol
+                        if changeInOperatorsPrecedence(lastOperator, newOperator: symbol) {
+                            description = "(\(description)) " + symbol
+                        } else {
+                            description += " " + symbol
+                        }
                         isFinal = false
+                        lastOperator = symbol
                     case .Equal:
                         isFinal = true
                     }
