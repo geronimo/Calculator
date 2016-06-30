@@ -551,15 +551,15 @@
             </objects>
             <point key="canvasLocation" x="826" y="1177"/>
         </scene>
-        <!--View Controller-->
+        <!--Graph View Controller-->
         <scene sceneID="LYN-pm-5tv">
             <objects>
-                <viewController id="E07-KZ-p6W" sceneMemberID="viewController">
+                <viewController id="E07-KZ-p6W" customClass="GraphViewController" customModule="Calculator" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="znK-cn-LyQ"/>
                         <viewControllerLayoutGuide type="bottom" id="hXZ-uz-SAP"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="bCW-9m-p6t">
+                    <view key="view" contentMode="scaleToFill" id="bCW-9m-p6t" customClass="GraphView" customModule="Calculator" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
