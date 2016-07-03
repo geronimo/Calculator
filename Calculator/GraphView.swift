@@ -11,11 +11,13 @@ import UIKit
 @IBDesignable
 class GraphView: UIView {
 
-    @IBInspectable var pointsPerUnit: CGFloat = 50 {
+    @IBInspectable var scale: CGFloat = 1 {
         didSet {
             setNeedsDisplay()
         }
     }
+    
+    var pointsPerUnit: CGFloat = 50
     
     var graphOrigin: CGPoint {
         get {
@@ -35,7 +37,7 @@ class GraphView: UIView {
     func handlePinch(gesture: UIPinchGestureRecognizer) {
         switch gesture.state {
         case .Changed, .Ended:
-            pointsPerUnit *= gesture.scale
+            scale *= gesture.scale
             gesture.scale = 1.0
         default:
             break
@@ -63,7 +65,17 @@ class GraphView: UIView {
     }
     
     override func drawRect(rect: CGRect) {
-        axesDrawer.drawAxesInRect(self.bounds, origin: graphOrigin, pointsPerUnit: pointsPerUnit)
-        functionDrawer.graphFunction(self.bounds, origin: graphOrigin, functionToGraph: { 1/($0) }, pointsPerUnit: pointsPerUnit)
+        axesDrawer.drawAxesInRect(
+            self.bounds,
+            origin: graphOrigin,
+            pointsPerUnit: pointsPerUnit * scale
+        )
+        
+        functionDrawer.graphFunction(
+            self.bounds,
+            origin: graphOrigin,
+            functionToGraph: { sin($0) },
+            pointsPerUnit: pointsPerUnit * scale
+        )
     }
 }
