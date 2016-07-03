@@ -12,13 +12,32 @@ class GraphViewController: UIViewController {
 
     var functionToGraph: ((Double) -> Double)? = { sin($0) }
 
-    @IBOutlet private var graphView: GraphView!
+    @IBOutlet private var graphView: GraphView! {
+        didSet {
+            graphView.addGestureRecognizer(
+                UIPinchGestureRecognizer(
+                    target: graphView,
+                    action: #selector(GraphView.handlePinch(_:))
+                )
+            )
+            
+            let doubleTapReconizer = UITapGestureRecognizer(
+                target: graphView,
+                action: #selector(GraphView.handleTap(_:))
+            )
+            doubleTapReconizer.numberOfTapsRequired = 2
+            graphView.addGestureRecognizer(doubleTapReconizer)
+            
+            let panRecognizer = UIPanGestureRecognizer(
+                target: graphView,
+                action: #selector(GraphView.handlePan(_:)
+                )
+            )
+            graphView.addGestureRecognizer(panRecognizer)
+        }
+    }
     
     override func viewDidLoad() {
-        //graphFunction()
         super.viewDidLoad()
     }
-
-    // MARK: - Navigation
-
 }

@@ -12,7 +12,7 @@ class FunctionDrawer {
     
     var color = UIColor.redColor()
     
-    func graphFunction(bounds: CGRect, functionToGraph: (Double)->Double, pointsPerUnit: Double) {
+    func graphFunction(bounds: CGRect, functionToGraph: (Double)->Double, pointsPerUnit: CGFloat) {
         
         CGContextSaveGState(UIGraphicsGetCurrentContext())
         color.set()
@@ -23,7 +23,7 @@ class FunctionDrawer {
         
         while x <= bounds.width {
             
-            let i = Double(x - bounds.midX) / pointsPerUnit
+            let i = Double(x - bounds.midX) / Double(pointsPerUnit)
             let j = functionToGraph(i)
             //print(i, j)
             
