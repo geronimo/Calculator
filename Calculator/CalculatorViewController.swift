@@ -107,6 +107,18 @@ class CalculatorViewController: UIViewController {
         descriptionDisplay.text = brain.description
         display.text = brain.result
     }
+    
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if let identifier = segue.identifier {
+            switch identifier {
+            case "Show Graph":
+                break
+            default:
+                break
+            }
+        }
+    }
 }
 
 

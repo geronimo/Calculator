@@ -11,9 +11,12 @@ import UIKit
 class GraphView: UIView {
 
     private var axesDrawer = AxesDrawer()
-    
+    private var functionDrawer = FunctionDrawer()
+        
     override func drawRect(rect: CGRect) {
         let origin = CGPoint(x: bounds.midX, y: bounds.midY)
-        axesDrawer.drawAxesInRect(self.bounds, origin: origin, pointsPerUnit: 30)
+        axesDrawer.drawAxesInRect(self.bounds, origin: origin, pointsPerUnit: 50)
+        
+        functionDrawer.graphFunction(self.bounds, functionToGraph: { tan($0) }, pointsPerUnit: 50)
     }
 }

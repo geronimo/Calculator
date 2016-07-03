@@ -564,6 +564,9 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
+                    <connections>
+                        <outlet property="graphView" destination="bCW-9m-p6t" id="lia-DP-r5c"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lpz-ex-cXE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -572,13 +575,13 @@
         <!--Split View Controller-->
         <scene sceneID="IzF-3k-Exz">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="B4x-mD-bpc" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <splitViewController id="4VC-RC-pRb" sceneMemberID="viewController">
                     <connections>
                         <segue destination="E07-KZ-p6W" kind="relationship" relationship="detailViewController" id="V3d-aY-vrO"/>
                         <segue destination="k7a-s0-YYv" kind="relationship" relationship="masterViewController" id="E06-Xg-1ae"/>
                     </connections>
                 </splitViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="B4x-mD-bpc" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-806" y="1631"/>
         </scene>
