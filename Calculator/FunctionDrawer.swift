@@ -12,7 +12,7 @@ class FunctionDrawer {
     
     var color = UIColor.redColor()
     
-    func graphFunction(bounds: CGRect, functionToGraph: (Double)->Double, pointsPerUnit: CGFloat) {
+    func graphFunction(bounds: CGRect, origin: CGPoint, functionToGraph: (Double)->Double, pointsPerUnit: CGFloat) {
         
         CGContextSaveGState(UIGraphicsGetCurrentContext())
         color.set()
@@ -23,19 +23,18 @@ class FunctionDrawer {
         
         while x <= bounds.width {
             
-            let i = Double(x - bounds.midX) / Double(pointsPerUnit)
+            // Translate the point to the first point to graph in within the bounds
+            let i = Double(x - origin.x) / Double(pointsPerUnit)
             let j = functionToGraph(i)
-            //print(i, j)
             
             // Check that the number is valid
             if j != j {
-                //print("NaN")
                 x += 1
                 firstPoint = true
                 continue
             }
             
-            let nextPoint = CGPoint(x: x, y: (CGFloat(-j) * CGFloat(pointsPerUnit)) + bounds.midY )
+            let nextPoint = CGPoint(x: x, y: (CGFloat(-j) * CGFloat(pointsPerUnit)) + origin.y)
             
             // Check if the function is continuous between the last two points
             if !firstPoint && !isContinous(path.currentPoint, nextPoint: nextPoint) {
@@ -58,12 +57,5 @@ class FunctionDrawer {
     func isContinous(currentPoint: CGPoint, nextPoint: CGPoint) -> Bool {
         let slope = (nextPoint.y - currentPoint.y) / (nextPoint.x - currentPoint.x)
         return abs(slope) < 100
-    }
-    
-    func transformPointFromBoundsToCartesian(point: CGPoint, bounds: CGRect) -> CGPoint {
-        return CGPoint(
-            x: point.x + bounds.midX,
-            y: point.y + bounds.midY
-        )
     }
 }

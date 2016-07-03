@@ -64,6 +64,6 @@ class GraphView: UIView {
     
     override func drawRect(rect: CGRect) {
         axesDrawer.drawAxesInRect(self.bounds, origin: graphOrigin, pointsPerUnit: pointsPerUnit)
-        //functionDrawer.graphFunction(self.bounds, origin: graphOrigin, functionToGraph: { sin($0) }, pointsPerUnit: pointsPerUnit)
+        functionDrawer.graphFunction(self.bounds, origin: graphOrigin, functionToGraph: { 1/($0) }, pointsPerUnit: pointsPerUnit)
     }
 }
