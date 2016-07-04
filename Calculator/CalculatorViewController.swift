@@ -108,12 +108,27 @@ class CalculatorViewController: UIViewController {
         display.text = brain.result
     }
     
+    private func graphThis(x: Double) -> Double {
+        brain.variableValues["M"] = x
+        brain.program = program!
+        return Double(brain.result) ?? 0
+    }
+    
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if let identifier = segue.identifier {
             switch identifier {
             case "Show Graph":
-                break
+                if userIsInTheMiddleOfTyping {
+                    break
+                }
+                var destinationViewController = segue.destinationViewController
+                if let navigationController = destinationViewController as? UINavigationController {
+                    destinationViewController = navigationController.visibleViewController!
+                }
+                if let viewController = destinationViewController as? GraphViewController {
+                    viewController.functionToGraph = graphThis
+                }
             default:
                 break
             }

@@ -35,7 +35,7 @@ class FunctionDrawer {
             }
             
             let nextPoint = CGPoint(x: x, y: (CGFloat(-j) * CGFloat(pointsPerUnit)) + origin.y)
-            
+
             // Check if the function is continuous between the last two points
             if !firstPoint && !isContinous(path.currentPoint, nextPoint: nextPoint) {
                 firstPoint = true
@@ -55,6 +55,9 @@ class FunctionDrawer {
     }
     
     func isContinous(currentPoint: CGPoint, nextPoint: CGPoint) -> Bool {
+        if !nextPoint.y.isNormal && !nextPoint.y.isZero {
+            return false
+        }
         let slope = (nextPoint.y - currentPoint.y) / (nextPoint.x - currentPoint.x)
         return abs(slope) < 100
     }

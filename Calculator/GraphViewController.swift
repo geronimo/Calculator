@@ -10,7 +10,7 @@ import UIKit
 
 class GraphViewController: UIViewController {
 
-    var functionToGraph: ((Double) -> Double)? = { sin($0) }
+    var functionToGraph: ((Double) -> Double)?
 
     @IBOutlet private var graphView: GraphView! {
         didSet {
@@ -34,6 +34,8 @@ class GraphViewController: UIViewController {
                 )
             )
             graphView.addGestureRecognizer(panRecognizer)
+            
+            graphView.functionToGraph = self.functionToGraph
         }
     }
     

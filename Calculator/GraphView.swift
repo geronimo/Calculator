@@ -29,6 +29,12 @@ class GraphView: UIView {
         }
     }
     
+    var functionToGraph: ((Double)->Double)? {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    
     private var origin: CGPoint?
     
     private var axesDrawer = AxesDrawer()
@@ -71,11 +77,13 @@ class GraphView: UIView {
             pointsPerUnit: pointsPerUnit * scale
         )
         
-        functionDrawer.graphFunction(
-            self.bounds,
-            origin: graphOrigin,
-            functionToGraph: { sin($0) },
-            pointsPerUnit: pointsPerUnit * scale
-        )
+        if let function = functionToGraph {
+            functionDrawer.graphFunction(
+                self.bounds,
+                origin: graphOrigin,
+                functionToGraph: function,
+                pointsPerUnit: pointsPerUnit * scale
+            )
+        }
     }
 }
